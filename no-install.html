@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Todo App - No Install</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f4f8;
+        margin: 0;
+        padding: 0;
+      }
+
+      .App {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        width: 100%;
+        max-width: 480px;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        text-align: center;
+        color: #333;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      input[type='text'] {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      input[type='text']:focus {
+        outline: none;
+        border-color: #4a90e2;
+      }
+
+      button {
+        padding: 12px 18px;
+        border: none;
+        border-radius: 8px;
+        background: #4a90e2;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      button:hover {
+        background: #357abd;
+      }
+
+      .empty-message {
+        text-align: center;
+        color: #777;
+        margin: 30px 0;
+      }
+
+      .todo-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .todo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #fafafa;
+        border-radius: 8px;
+      }
+
+      .todo-item.completed .todo-text {
+        text-decoration: line-through;
+        color: #999;
+      }
+
+      .todo-text {
+        cursor: pointer;
+        flex: 1;
+        word-break: break-word;
+      }
+
+      .delete-btn {
+        background: #e74c3c;
+        padding: 8px 12px;
+        font-size: 14px;
+        margin-left: 10px;
+      }
+
+      .delete-btn:hover {
+        background: #c0392b;
+      }
+
+      .status {
+        text-align: center;
+        color: #555;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Load React and ReactDOM from a CDN (internet required) -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <!-- Babel transforms JSX inside the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const React = window.React;
+      const { useState } = React;
+      const ReactDOM = window.ReactDOM;
+
+      function App() {
+        const [todos, setTodos] = useState([]);
+        const [inputValue, setInputValue] = useState('');
+
+        const handleAddTodo = () => {
+          if (inputValue.trim() === '') return;
+
+          const newTodo = {
+            id: Date.now(),
+            text: inputValue.trim(),
+            completed: false,
+          };
+
+          setTodos([...todos, newTodo]);
+          setInputValue('');
+        };
+
+        const handleKeyDown = (e) => {
+          if (e.key === 'Enter') {
+            handleAddTodo();
+          }
+        };
+
+        const toggleTodo = (id) => {
+          setTodos(
+            todos.map((todo) =>
+              todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            )
+          );
+        };
+
+        const deleteTodo = (id) => {
+          setTodos(todos.filter((todo) => todo.id !== id));
+        };
+
+        return (
+          <div className="App">
+            <div className="container">
+              <h1>📝 My Todo App</h1>
+
+              <div className="input-group">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Enter a new task..."
+                />
+                <button onClick={handleAddTodo}>Add</button>
+              </div>
+
+              {todos.length === 0 ? (
+                <p className="empty-message">No tasks yet. Add one above!</p>
+              ) : (
+                <ul className="todo-list">
+                  {todos.map((todo) => (
+                    <li
+                      key={todo.id}
+                      className={`todo-item ${
+                        todo.completed ? 'completed' : ''
+                      }`}
+                    >
+                      <span
+                        onClick={() => toggleTodo(todo.id)}
+                        className="todo-text"
+                      >
+                        {todo.text}
+                      </span>
+                      <button
+                        onClick={() => deleteTodo(todo.id)}
+                        className="delete-btn"
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <p className="status">
+                Total tasks: {todos.length} | Completed:{' '}
+                {todos.filter((todo) => todo.completed).length}
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
